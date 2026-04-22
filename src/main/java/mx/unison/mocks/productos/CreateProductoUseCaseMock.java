@@ -14,17 +14,17 @@ public class CreateProductoUseCaseMock extends CreateProductoUseCase {
     @Override
     public boolean execute(String nombre, double precio, int cantidad, String descripcion, int idAlmacen) {
         long timeStamp = System.currentTimeMillis();
-        var producto = new Producto.Builder()
-                .setNombre(nombre)
-                .setPrecio(precio)
-                .setCantidad(cantidad)
-                .setDescripcion(descripcion)
-                .setAlmacenId(idAlmacen)
-                .setDepartamento("")
-                .setFechaCreacion((int) timeStamp)
-                .setFechaModificacion(String.valueOf(timeStamp))
-                .setUltimoUsuario("ADMIN")
-                .build();
+        var producto = new Producto();
+        producto.setNombre(nombre);
+        producto.setPrecio(precio);
+        producto.setCantidad(cantidad);
+        producto.setDescripcion(descripcion);
+        producto.setAlmacenId(idAlmacen);
+        producto.setDepartamento("");
+        producto.setFechaCreacion((int) timeStamp);
+        producto.setFechaModificacion(String.valueOf(timeStamp));
+        producto.setUltimoUsuario("ADMIN");
+
 
         this.saveCalled = true;
         this.productoRecibido = producto;

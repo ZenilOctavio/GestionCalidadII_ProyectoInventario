@@ -40,7 +40,7 @@ public class DatabaseSeeder {
             ps.setString(1, nombre);
             ResultSet rs = ps.executeQuery();
             if (!rs.next()) {
-                String ins = "INSERT INTO usuarios(nombre, password, rol) VALUES(?, ?, ?)";
+                String ins = "INSERT INTO usuarios(nombre, contrasena, rol) VALUES(?, ?, ?)";
                 try (PreparedStatement ps2 = db.conn.prepareStatement(ins)) {
                     ps2.setString(1, nombre);
                     ps2.setString(2, passwordHasher.hash(passPlain));

@@ -24,9 +24,15 @@ class ModifyProductoPresenterTest {
         findUseCase = new FindByIdUseCaseMock();
 
         // Simulamos un producto existente por defecto para los tests de guardado
-        findUseCase.productoRetornado = new Producto.Builder()
-                .setId(1).setNombre("Producto Original").setPrecio(10.0)
-                .setCantidad(5).setDescripcion("Desc").build();
+        var productoRetornado = new Producto();
+        productoRetornado.setId(1);
+        productoRetornado.setNombre("Producto Original");
+        productoRetornado.setPrecio(10.0);
+        productoRetornado.setCantidad(5);
+        productoRetornado.setDescripcion("Desc");
+        findUseCase.productoRetornado = productoRetornado;
+
+
 
         presenter = new ModifyProductoPresenter(
                 1, modifyUseCase, findUseCase, null, () -> saveSuccessCalled = true

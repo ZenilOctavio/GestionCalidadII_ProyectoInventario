@@ -124,13 +124,13 @@ public class SQLiteAlmacenesRepository implements AlmacenesRepository {
     }
 
     private Almacen mapResultSetToAlmacen(ResultSet res) throws SQLException {
-        return new Almacen.Builder()
-                .setId(res.getInt("id"))
-                .setNombre(res.getString("nombre"))
-                .setFechaHoraCreacion(res.getString("fecha_hora_creacion"))
-                .setFechaHoraUltimaMod(res.getString("fecha_hora_ultima_modificacion"))
-                .setUltimoUsuario(res.getString("ultimo_usuario_en_modificar"))
-                .build();
+        var almacen = new Almacen();
+        almacen.setId(res.getInt("id"));
+        almacen.setNombre(res.getString("nombre"));
+        almacen.setFechaHoraCreacion(res.getString("fecha_hora_creacion"));
+        almacen.setFechaHoraUltimaMod(res.getString("fecha_hora_ultima_modificacion"));
+        almacen.setUltimoUsuario(res.getString("ultimo_usuario_en_modificar"));
+        return almacen;
     }
 
 }

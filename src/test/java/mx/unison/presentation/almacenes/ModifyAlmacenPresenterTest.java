@@ -24,10 +24,13 @@ class ModifyAlmacenPresenterTest {
         findUseCase = new FindByIdAlmacenMock();
 
         // Almacén base para que los tests de edición funcionen
-        findUseCase.almacenARetornar = new Almacen.Builder()
-                .setId(10)
-                .setNombre("Almacen de Prueba")
-                .build();
+        var almacenRetornar = new Almacen();
+        almacenRetornar.setId(10);
+        almacenRetornar.setNombre("Almacen de Prueba");
+        findUseCase.almacenARetornar = almacenRetornar;
+
+
+
 
         presenter = new ModifyAlmacenPresenter(
                 10, modifyUseCase, findUseCase, () -> saveSuccessCalled = true

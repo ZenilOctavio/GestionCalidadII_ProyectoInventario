@@ -14,12 +14,12 @@ public class CreateAlmacenUseCase {
 
     public boolean execute (String nombre) {
         long timeStamp = System.currentTimeMillis();
-        var nuevoAlmacen = new Almacen.Builder()
-                .setNombre(nombre)
-                .setFechaHoraCreacion(String.valueOf(timeStamp))
-                .setFechaHoraUltimaMod(String.valueOf(timeStamp))
-                .setUltimoUsuario("ADMIN")
-                .build();
+        var nuevoAlmacen = new Almacen();
+        nuevoAlmacen.setNombre(nombre);
+        nuevoAlmacen.setFechaHoraCreacion(String.valueOf(timeStamp));
+        nuevoAlmacen.setFechaHoraUltimaMod(String.valueOf(timeStamp));
+        nuevoAlmacen.setUltimoUsuario("ADMIN");
+
 
         return repository.createAlmacen(nuevoAlmacen);
 

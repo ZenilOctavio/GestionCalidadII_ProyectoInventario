@@ -1,8 +1,6 @@
 package mx.unison.presentation;
 
-import mx.unison.infrastructure.data.SQLiteAlmacenesRepository;
-import mx.unison.infrastructure.data.SQLiteProductsRepository;
-import mx.unison.infrastructure.data.SQLiteUsersRepository;
+import mx.unison.infrastructure.data.*;
 import mx.unison.infrastructure.persistence.Database;
 import mx.unison.infrastructure.persistence.NoConfigEstablished;
 import mx.unison.infrastructure.security.Md5PasswordHasher;
@@ -48,9 +46,11 @@ public class Vistas extends JFrame {
         catch(NoConfigEstablished ex){
             throw new RuntimeException(ex);
         }
-        var userRepo = new SQLiteUsersRepository(db);
-        var productosRepo = new SQLiteProductsRepository(db);
-        var almacenesRepo = new SQLiteAlmacenesRepository(db);
+
+        // Usar los DAOs de la base de datos
+        var userRepo = new ORMLiteUsersRepository(db.getUsuarioDAO());
+        var productosRepo = new ORMLiteProductsRepository(db.getProductoDAO());
+        var almacenesRepo = new ORMLiteAlmacenesRepository(db.getAlmacenDAO());
 
         var getAllAlmacenesUseCase = new GetAllAlmacenesUseCase(almacenesRepo);
 
@@ -95,8 +95,6 @@ public class Vistas extends JFrame {
                 )
         );
 
-
-
         container.add(login, AppNavigator.LOGIN);
         container.add(home, AppNavigator.HOME);
         container.add(productos, AppNavigator.PRODUCTOS);
@@ -105,5 +103,4 @@ public class Vistas extends JFrame {
         add(container);
         navigator.navigateToLogin();
     }
-
 }

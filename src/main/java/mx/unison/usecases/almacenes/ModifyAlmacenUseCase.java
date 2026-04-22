@@ -12,14 +12,13 @@ public class ModifyAlmacenUseCase {
 
     public boolean execute(int id, String nombre){
         long timeStamp = System.currentTimeMillis();
-        var nuevoAlmacen = new Almacen.Builder()
-                .setId(id)
-                .setNombre(nombre)
-                .setFechaHoraUltimaMod(String.valueOf(timeStamp))
-                .setUltimoUsuario("ADMIN")
-                .build();
+
+        var nuevoAlmacen = new Almacen();
+        nuevoAlmacen.setId(id);
+        nuevoAlmacen.setNombre(nombre);
+        nuevoAlmacen.setFechaHoraUltimaMod(String.valueOf(timeStamp));
+        nuevoAlmacen.setUltimoUsuario("ADMIN");
 
         return repository.updateAlmacen(nuevoAlmacen);
-
     }
 }

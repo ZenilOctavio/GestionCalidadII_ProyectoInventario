@@ -12,20 +12,18 @@ public class CreateProductoUseCase {
 
     public boolean execute (String nombre, double precio, int cantidad, String descripcion, int idAlmacen) {
         long timeStamp = System.currentTimeMillis();
-        var nuevoProducto = new Producto.Builder()
-                .setNombre(nombre)
-                .setPrecio(precio)
-                .setCantidad(cantidad)
-                .setDescripcion(descripcion)
-                .setAlmacenId(idAlmacen)
-                .setDepartamento("")
-                .setFechaCreacion((int) timeStamp)
-                .setFechaModificacion(String.valueOf(timeStamp))
-                .setUltimoUsuario("ADMIN")
-                .build();
+
+        var nuevoProducto = new Producto();
+        nuevoProducto.setNombre(nombre);
+        nuevoProducto.setPrecio(precio);
+        nuevoProducto.setCantidad(cantidad);
+        nuevoProducto.setDescripcion(descripcion);
+        nuevoProducto.setAlmacenId(idAlmacen);
+        nuevoProducto.setDepartamento("");
+        nuevoProducto.setFechaCreacion(timeStamp);
+        nuevoProducto.setFechaModificacion(String.valueOf(timeStamp));
+        nuevoProducto.setUltimoUsuario("ADMIN");
 
         return repository.createProduct(nuevoProducto);
-
     }
-
 }

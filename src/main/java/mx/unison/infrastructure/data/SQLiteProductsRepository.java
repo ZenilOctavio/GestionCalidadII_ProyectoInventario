@@ -54,7 +54,7 @@ public class SQLiteProductsRepository implements ProductsRepository {
             stmt.setString(4, producto.departamento());
             stmt.setInt(5, producto.almacenId());
             stmt.setString(6, producto.descripcion());
-            stmt.setInt(7, producto.fechaCreacion());
+            stmt.setInt(7, (int) producto.fechaCreacion());
             stmt.setString(8, producto.fechaModificacion());
             stmt.setString(9, producto.ultimoUsuario());
             var res = stmt.executeUpdate();
@@ -134,17 +134,18 @@ public class SQLiteProductsRepository implements ProductsRepository {
     }
 
     private Producto mapResultSetToProducto(ResultSet res) throws SQLException {
-        return new Producto.Builder()
-                .setId(res.getInt("id"))
-                .setNombre(res.getString("nombre"))
-                .setPrecio(res.getDouble("precio"))
-                .setCantidad(res.getInt("cantidad"))
-                .setDescripcion(res.getString("descripcion"))
-                .setDepartamento(res.getString("departamento"))
-                .setAlmacenId(res.getInt("almacen_id"))
-                .setFechaCreacion(res.getInt("fecha_hora_creacion"))
-                .setFechaModificacion(res.getString("fecha_hora_ultima_modificacion"))
-                .setUltimoUsuario(res.getString("ultimo_usuario_en_modificar"))
-                .build();
+        var producto = new Producto();
+        producto.setId(res.getInt("id"));
+        producto.setNombre(res.getString("nombre"));
+        producto.setPrecio(res.getDouble("precio"));
+        producto.setCantidad(res.getInt("cantidad"));
+        producto.setDescripcion(res.getString("descripcion"));
+        producto.setDepartamento(res.getString("departamento"));
+        producto.setAlmacenId(res.getInt("almacen_id"));
+        producto.setFechaCreacion(res.getInt("fecha_hora_creacion"));
+        producto.setFechaModificacion(res.getString("fecha_hora_ultima_modificacion"));
+        producto.setUltimoUsuario(res.getString("ultimo_usuario_en_modificar"));
+
+        return producto;
     }
 }

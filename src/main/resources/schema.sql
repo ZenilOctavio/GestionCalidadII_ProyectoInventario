@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS usuarios(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT UNIQUE,
-    password TEXT NOT NULL,
+    contrasena TEXT NOT NULL,
     fecha_hora_ultimo_inicio TEXT,
     rol TEXT NOT NULL
 );

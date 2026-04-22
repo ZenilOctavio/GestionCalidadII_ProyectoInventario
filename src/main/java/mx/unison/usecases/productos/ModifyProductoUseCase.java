@@ -12,19 +12,18 @@ public class ModifyProductoUseCase {
 
     public boolean execute(int id, String nombre, double precio, int cantidad, String descripcion, int idAlmacen){
         long timeStamp = System.currentTimeMillis();
-        var nuevoProducto = new Producto.Builder()
-                .setId(id)
-                .setNombre(nombre)
-                .setPrecio(precio)
-                .setCantidad(cantidad)
-                .setDescripcion(descripcion)
-                .setAlmacenId(idAlmacen)
-                .setDepartamento("")
-                .setFechaModificacion(String.valueOf(timeStamp))
-                .setUltimoUsuario("ADMIN")
-                .build();
+
+        var nuevoProducto = new Producto();
+        nuevoProducto.setId(id);
+        nuevoProducto.setNombre(nombre);
+        nuevoProducto.setPrecio(precio);
+        nuevoProducto.setCantidad(cantidad);
+        nuevoProducto.setDescripcion(descripcion);
+        nuevoProducto.setAlmacenId(idAlmacen);
+        nuevoProducto.setDepartamento("");
+        nuevoProducto.setFechaModificacion(String.valueOf(timeStamp));
+        nuevoProducto.setUltimoUsuario("ADMIN");
 
         return repository.updateProduct(nuevoProducto);
-
     }
 }

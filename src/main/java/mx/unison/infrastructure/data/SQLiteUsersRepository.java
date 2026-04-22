@@ -27,12 +27,12 @@ public class SQLiteUsersRepository implements UsersRepository {
             if (!set.next()) return Optional.empty();
 
 
-            Usuario.Builder builder = new Usuario.Builder();
-            builder.setRol(set.getString("rol"));
-            builder.setContrasena(set.getString("password"));
-            builder.setNombre(set.getString("nombre"));
+            var usuario = new Usuario();
+            usuario.setRol(set.getString("rol"));
+            usuario.setContrasena(set.getString("password"));
+            usuario.setNombre(set.getString("nombre"));
 
-            return Optional.of(builder.build());
+            return Optional.of(usuario);
 
         }
         catch(SQLException ex){
