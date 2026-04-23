@@ -180,9 +180,6 @@ public class Producto {
         return ultimoUsuario;
     }
 
-    public Almacen almacen(){
-        return almacen;
-    }
 
     @Override
     public String toString() {
@@ -192,5 +189,9 @@ public class Producto {
                 ", precio=" + precio +
                 ", cantidad=" + cantidad +
                 '}';
+    }
+
+    public Almacen getAlmacen() {
+        return almacen;
     }
 }
