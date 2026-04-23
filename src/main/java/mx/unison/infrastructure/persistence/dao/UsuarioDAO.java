@@ -1,10 +1,10 @@
 package mx.unison.infrastructure.persistence.dao;
 
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
 import mx.unison.core.domain.models.Usuario;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 public class UsuarioDAO {
@@ -20,6 +20,10 @@ public class UsuarioDAO {
                 .eq("nombre", name)
                 .queryForFirst();
         return Optional.ofNullable(usuario);
+    }
+
+    public List<Usuario> findAll() throws SQLException {
+        return dao.queryForAll();
     }
 
     public void create(Usuario usuario) throws SQLException {

@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import mx.unison.core.domain.models.Producto;
 import mx.unison.presentation.navigation.AppNavigatorFX;
+import mx.unison.presentation.session.SessionManager;
 import mx.unison.presentation.productos.dialogs.CreateProductoController;
 import mx.unison.presentation.productos.dialogs.ModifyProductoController;
 import mx.unison.usecases.productos.GetAllProductosUseCase;
@@ -52,6 +53,7 @@ public class ProductosController {
     private ModifyProductoUseCase modifyProductoUseCase;
     private FindByIdProductoUseCase findByIdProductoUseCase;
     private GetAllAlmacenesUseCase getAllAlmacenesUseCase;
+    private boolean initialized = false;  // ✓ Flag de inicialización
 
     public ProductosController(AppNavigatorFX navigator,
                                GetAllProductosUseCase getAllProductosUseCase,
@@ -81,7 +83,7 @@ public class ProductosController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/productos.fxml"));
             loader.setController(this);
-            VBox root = loader.load();  // ✓ Correcto: VBox
+            VBox root = loader.load();
             return new Scene(root, 1000, 720);
         } catch (IOException e) {
             System.err.println("Error al cargar productos.fxml: " + e.getMessage());
@@ -91,6 +93,7 @@ public class ProductosController {
 
     @FXML
     private void initialize() {
+        // ✓ NO verificar permisos aquí, solo configurar componentes
         idColumn.setCellValueFactory(cellData ->
                 new SimpleObjectProperty<>(cellData.getValue().getId())
         );
@@ -104,12 +107,31 @@ public class ProductosController {
                 new SimpleObjectProperty<>(cellData.getValue().getCantidad())
         );
 
-        loadProductos();
-
         createButton.setOnAction(e -> handleCreate());
         editButton.setOnAction(e -> handleEdit());
         deleteButton.setOnAction(e -> handleDelete());
         backButton.setOnAction(e -> handleBack());
+    }
+
+    // ✓ NUEVO: Método para inicializar permisos cuando se muestra la pantalla
+    public void onSceneShown() {
+        if (initialized) return;
+        initialized = true;
+
+        var session = SessionManager.getInstance();
+        if (!session.canManageProducts()) {
+            showError("Acceso denegado", "No tienes permisos para acceder a esta sección");
+            handleBack();
+            return;
+        }
+
+        loadProductos();
+
+        // ✓ Deshabilitar botones de creación/edición si no es ADMIN o PRODUCTOS
+        boolean canCreate = session.canManageProducts();
+        createButton.setDisable(!canCreate);
+        editButton.setDisable(!canCreate);
+        deleteButton.setDisable(!canCreate);
     }
 
     private void loadProductos() {
@@ -126,6 +148,12 @@ public class ProductosController {
     private void handleCreate() {
         if (createProductoUseCase == null || getAllAlmacenesUseCase == null) {
             showWarning("No disponible", "Las operaciones de creación no están disponibles");
+            return;
+        }
+
+        var session = SessionManager.getInstance();
+        if (!session.canManageProducts()) {
+            showError("Acceso denegado", "No tienes permisos para crear productos");
             return;
         }
 
@@ -149,6 +177,12 @@ public class ProductosController {
             return;
         }
 
+        var session = SessionManager.getInstance();
+        if (!session.canManageProducts()) {
+            showError("Acceso denegado", "No tienes permisos para editar productos");
+            return;
+        }
+
         ModifyProductoController dialog = new ModifyProductoController(
                 modifyProductoUseCase,
                 findByIdProductoUseCase,
@@ -162,6 +196,12 @@ public class ProductosController {
         Producto selected = productosTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showWarning("Selección vacía", "Por favor selecciona un producto para eliminar");
+            return;
+        }
+
+        var session = SessionManager.getInstance();
+        if (!session.canManageProducts()) {
+            showError("Acceso denegado", "No tienes permisos para eliminar productos");
             return;
         }
 

@@ -10,6 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import mx.unison.usecases.LoginUseCase;
 import mx.unison.presentation.navigation.AppNavigatorFX;
+import mx.unison.presentation.session.SessionManager;
 
 import java.io.IOException;
 
@@ -21,7 +22,7 @@ public class LoginController {
     @FXML
     private Button loginButton;
     @FXML
-    private AnchorPane root;  // ✓ CAMBIO: AnchorPane en lugar de VBox
+    private AnchorPane root;
 
     private LoginUseCase loginUseCase;
     private AppNavigatorFX navigator;
@@ -35,7 +36,7 @@ public class LoginController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
             loader.setController(this);
-            AnchorPane root = loader.load();  // ✓ CAMBIO: AnchorPane
+            AnchorPane root = loader.load();
             return new Scene(root, 1000, 720);
         } catch (IOException e) {
             System.err.println("Error al cargar login.fxml: " + e.getMessage());
@@ -64,16 +65,19 @@ public class LoginController {
             return;
         }
 
-        boolean success = loginUseCase.withUsernamePassword(username, password);
+        var usuarioOpt = loginUseCase.withUsernamePassword(username, password);
 
-        if (!success) {
+        if (usuarioOpt.isEmpty()) {
             showError("Credenciales inválidas", "El usuario o contraseña son incorrectos");
             passwordField.clear();
             return;
         }
 
-        // Login exitoso
-        System.out.println("✓ Login exitoso para usuario: " + username);
+        // ✓ Guardar usuario en sesión
+        var usuario = usuarioOpt.get();
+        SessionManager.getInstance().login(usuario);
+
+        System.out.println("✓ Login exitoso para usuario: " + username + " - Rol: " + usuario.getRol());
         navigator.navigateTo(AppNavigatorFX.HOME);
     }
 

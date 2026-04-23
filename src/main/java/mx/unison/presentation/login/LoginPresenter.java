@@ -1,6 +1,7 @@
 package mx.unison.presentation.login;
 
 import mx.unison.presentation.navigation.Navigator;
+import mx.unison.presentation.login.LoginService;
 
 public class LoginPresenter {
     private LoginView view;
@@ -24,7 +25,9 @@ public class LoginPresenter {
             view.showError("El campo contraseña esta vacio");
         }
 
-        boolean success = loginService.withUsernamePassword(user, password);
+        var authUser = loginService.withUsernamePassword(user, password);
+
+        var success = authUser.isPresent();
 
         if (success) {
             navigator.navigateToHome();

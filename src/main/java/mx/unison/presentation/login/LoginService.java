@@ -1,5 +1,9 @@
 package mx.unison.presentation.login;
 
+import mx.unison.core.domain.models.Usuario;
+
+import java.util.Optional;
+
 public interface LoginService {
-    boolean withUsernamePassword(String username, String password);
+    Optional<Usuario> withUsernamePassword(String username, String password);
 }

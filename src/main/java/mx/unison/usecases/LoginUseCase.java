@@ -11,19 +11,26 @@ public class LoginUseCase implements LoginService {
     private final UsersRepository repository;
     private final PasswordHasher passwordHasher;
 
-    public LoginUseCase(UsersRepository rep, PasswordHasher passwordHasher){
-        this.repository = rep;
+    public LoginUseCase(UsersRepository repository, PasswordHasher passwordHasher) {
+        this.repository = repository;
         this.passwordHasher = passwordHasher;
     }
-    @Override
-    public boolean withUsernamePassword(String username, String password) {
-        Optional<Usuario> userOpt = repository.findByName(username);
 
-        if (userOpt.isEmpty()) return false;
+    // ✓ Retorna Optional<Usuario>
+    public Optional<Usuario> withUsernamePassword(String username, String password) {
+        var usuarioOpt = repository.findByName(username);
 
-        Usuario user = userOpt.get();
+        if (usuarioOpt.isEmpty()) {
+            return Optional.empty();
+        }
 
-        return passwordHasher.verify(password, user.contrasena());
+        var usuario = usuarioOpt.get();
+        String hashedPassword = passwordHasher.hash(password);
 
+        if (!usuario.getContrasena().equals(hashedPassword)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(usuario);
     }
 }

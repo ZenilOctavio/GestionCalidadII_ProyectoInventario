@@ -48,7 +48,7 @@ public class Vistas extends JFrame {
         }
 
         // Usar los DAOs de la base de datos
-        var userRepo = new ORMLiteUsersRepository(db.getUsuarioDAO());
+        var userRepo = new ORMLiteUsuariosRepository(db.getUsuarioDAO());
         var productosRepo = new ORMLiteProductsRepository(db.getProductoDAO());
         var almacenesRepo = new ORMLiteAlmacenesRepository(db.getAlmacenDAO());
 

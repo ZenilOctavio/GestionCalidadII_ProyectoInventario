@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import mx.unison.core.domain.models.Almacen;
 import mx.unison.presentation.navigation.AppNavigatorFX;
+import mx.unison.presentation.session.SessionManager;
 import mx.unison.presentation.almacenes.dialogs.CreateAlmacenController;
 import mx.unison.presentation.almacenes.dialogs.ModifyAlmacenController;
 import mx.unison.usecases.almacenes.GetAllAlmacenesUseCase;
@@ -47,6 +48,7 @@ public class AlmacenesController {
     private CreateAlmacenUseCase createAlmacenUseCase;
     private ModifyAlmacenUseCase modifyAlmacenUseCase;
     private FindByIdAlmacenUseCase findByIdAlmacenUseCase;
+    private boolean initialized = false;  // ✓ Flag de inicialización
 
     public AlmacenesController(AppNavigatorFX navigator,
                                GetAllAlmacenesUseCase getAllAlmacenesUseCase,
@@ -74,7 +76,7 @@ public class AlmacenesController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/almacenes.fxml"));
             loader.setController(this);
-            VBox root = loader.load();  // ✓ Correcto: VBox
+            VBox root = loader.load();
             return new Scene(root, 1000, 720);
         } catch (IOException e) {
             System.err.println("Error al cargar almacenes.fxml: " + e.getMessage());
@@ -84,6 +86,7 @@ public class AlmacenesController {
 
     @FXML
     private void initialize() {
+        // ✓ NO verificar permisos aquí, solo configurar componentes
         idColumn.setCellValueFactory(cellData ->
                 new SimpleObjectProperty<>(cellData.getValue().getId())
         );
@@ -94,12 +97,31 @@ public class AlmacenesController {
                 new SimpleStringProperty(cellData.getValue().getFechaHoraCreacion())
         );
 
-        loadAlmacenes();
-
         createButton.setOnAction(e -> handleCreate());
         editButton.setOnAction(e -> handleEdit());
         deleteButton.setOnAction(e -> handleDelete());
         backButton.setOnAction(e -> handleBack());
+    }
+
+    // ✓ NUEVO: Método para inicializar permisos cuando se muestra la pantalla
+    public void onSceneShown() {
+        if (initialized) return;
+        initialized = true;
+
+        var session = SessionManager.getInstance();
+        if (!session.canManageWarehouses()) {
+            showError("Acceso denegado", "No tienes permisos para acceder a esta sección");
+            handleBack();
+            return;
+        }
+
+        loadAlmacenes();
+
+        // ✓ Deshabilitar botones de creación/edición si no es ADMIN o ALMACEN
+        boolean canCreate = session.canManageWarehouses();
+        createButton.setDisable(!canCreate);
+        editButton.setDisable(!canCreate);
+        deleteButton.setDisable(!canCreate);
     }
 
     private void loadAlmacenes() {
@@ -116,6 +138,12 @@ public class AlmacenesController {
     private void handleCreate() {
         if (createAlmacenUseCase == null) {
             showWarning("No disponible", "Las operaciones de creación no están disponibles");
+            return;
+        }
+
+        var session = SessionManager.getInstance();
+        if (!session.canManageWarehouses()) {
+            showError("Acceso denegado", "No tienes permisos para crear almacenes");
             return;
         }
 
@@ -138,6 +166,12 @@ public class AlmacenesController {
             return;
         }
 
+        var session = SessionManager.getInstance();
+        if (!session.canManageWarehouses()) {
+            showError("Acceso denegado", "No tienes permisos para editar almacenes");
+            return;
+        }
+
         ModifyAlmacenController dialog = new ModifyAlmacenController(
                 modifyAlmacenUseCase,
                 findByIdAlmacenUseCase,
@@ -150,6 +184,12 @@ public class AlmacenesController {
         Almacen selected = almacenesTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showWarning("Selección vacía", "Por favor selecciona un almacén para eliminar");
+            return;
+        }
+
+        var session = SessionManager.getInstance();
+        if (!session.canManageWarehouses()) {
+            showError("Acceso denegado", "No tienes permisos para eliminar almacenes");
             return;
         }
 

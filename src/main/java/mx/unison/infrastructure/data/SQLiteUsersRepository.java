@@ -6,6 +6,7 @@ import mx.unison.infrastructure.persistence.Database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.util.List;
 import java.util.Optional;
 
 public class SQLiteUsersRepository implements UsersRepository {
@@ -14,6 +15,11 @@ public class SQLiteUsersRepository implements UsersRepository {
 
     public SQLiteUsersRepository(Database db) {
         this.db = db;
+    }
+
+    @Override
+    public List<Usuario> findAll() {
+        return List.of();
     }
 
     @Override
@@ -41,6 +47,21 @@ public class SQLiteUsersRepository implements UsersRepository {
             System.out.println(ex.getStackTrace());
             return Optional.empty();
         }
+
+    }
+
+    @Override
+    public void create(Usuario usuario) {
+
+    }
+
+    @Override
+    public void update(Usuario usuario) {
+
+    }
+
+    @Override
+    public void delete(Usuario usuario) {
 
     }
 }
