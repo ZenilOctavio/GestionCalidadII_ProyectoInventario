@@ -10,14 +10,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación de ProductsRepository utilizando JDBC directo para SQLite.
+ */
 public class SQLiteProductsRepository implements ProductsRepository {
 
     private final Database db;
 
+    /**
+     * Crea una instancia de SQLiteProductsRepository.
+     * @param db La conexión a la base de datos.
+     */
     public SQLiteProductsRepository(Database db) {
         this.db = db;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Producto> findAll() {
         String sql = "SELECT id, nombre, precio, cantidad, departamento, almacen_id, descripcion, fecha_hora_creacion, fecha_hora_ultima_modificacion, ultimo_usuario_en_modificar FROM productos";
@@ -42,6 +52,9 @@ public class SQLiteProductsRepository implements ProductsRepository {
 
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean createProduct(Producto producto) {
         String sql = "INSERT INTO productos (nombre, precio, cantidad, departamento, almacen_id, descripcion, fecha_hora_creacion, fecha_hora_ultima_modificacion, ultimo_usuario_en_modificar) VALUES (?,?,?,?,?,?,?,?,?)";
@@ -69,6 +82,9 @@ public class SQLiteProductsRepository implements ProductsRepository {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Producto> findById(int id) {
         String sql = "SELECT * FROM productos WHERE id = ?";
@@ -92,6 +108,9 @@ public class SQLiteProductsRepository implements ProductsRepository {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean updateProduct(Producto producto) {
         String sql = "UPDATE productos SET nombre=?, precio=?, cantidad=?, descripcion=?, departamento=?, almacen_id=?, fecha_hora_ultima_modificacion=? WHERE id = ?";
@@ -117,6 +136,9 @@ public class SQLiteProductsRepository implements ProductsRepository {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteProduct(Producto producto) {
         String sql = "DELETE FROM productos WHERE id = ?";
@@ -133,6 +155,13 @@ public class SQLiteProductsRepository implements ProductsRepository {
         }
     }
 
+    /**
+     * Mapea un ResultSet a un objeto Producto.
+     *
+     * @param res El ResultSet de la consulta.
+     * @return Un objeto Producto poblado.
+     * @throws SQLException Si ocurre un error al acceder a los datos.
+     */
     private Producto mapResultSetToProducto(ResultSet res) throws SQLException {
         var producto = new Producto();
         producto.setId(res.getInt("id"));

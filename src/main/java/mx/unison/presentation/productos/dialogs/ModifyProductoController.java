@@ -1,26 +1,40 @@
 package mx.unison.presentation.productos.dialogs;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.stage.StageStyle;
+import javafx.util.StringConverter;
 import mx.unison.core.domain.models.Almacen;
 import mx.unison.core.domain.models.Producto;
+import mx.unison.presentation.components.ComponentFactory;
+import mx.unison.presentation.theme.FontLoader;
+import mx.unison.presentation.theme.ThemeConfig;
 import mx.unison.usecases.almacenes.GetAllAlmacenesUseCase;
 import mx.unison.usecases.productos.FindByIdProductoUseCase;
 import mx.unison.usecases.productos.ModifyProductoUseCase;
 
 import java.io.IOException;
-import java.util.List;
 
+/**
+ * Controlador para el diálogo de modificación de un producto existente.
+ * Permite actualizar los detalles de un artículo del inventario, incluyendo
+ * su nombre, descripción, precio, cantidad y almacén.
+ */
 public class ModifyProductoController {
     @FXML
-    private TextField idField;
+    private VBox root;
+    @FXML
+    private VBox headerContainer;
+    @FXML
+    private VBox formFields;
     @FXML
     private TextField nombreField;
     @FXML
@@ -32,19 +46,35 @@ public class ModifyProductoController {
     @FXML
     private ComboBox<Almacen> almacenCombo;
     @FXML
-    private Button cancelButton;
+    private Label nombreLabel;
     @FXML
-    private Button saveButton;
+    private Label descripcionLabel;
     @FXML
-    private VBox root;
+    private Label precioLabel;
+    @FXML
+    private Label cantidadLabel;
+    @FXML
+    private Label almacenLabel;
+    @FXML
+    private Label errorLabel;
+    @FXML
+    private HBox buttonContainer;
 
     private ModifyProductoUseCase modifyProductoUseCase;
     private FindByIdProductoUseCase findByIdProductoUseCase;
     private GetAllAlmacenesUseCase getAllAlmacenesUseCase;
     private Runnable onSuccess;
     private Stage dialogStage;
-    private Producto producto;
+    private int currentProductId;
 
+    /**
+     * Constructor del controlador de modificación.
+     *
+     * @param modifyProductoUseCase Caso de uso para aplicar los cambios.
+     * @param findByIdProductoUseCase Caso de uso para recuperar los datos actuales.
+     * @param getAllAlmacenesUseCase Caso de uso para listar almacenes.
+     * @param onSuccess Callback de éxito.
+     */
     public ModifyProductoController(ModifyProductoUseCase modifyProductoUseCase,
                                     FindByIdProductoUseCase findByIdProductoUseCase,
                                     GetAllAlmacenesUseCase getAllAlmacenesUseCase,
@@ -55,188 +85,163 @@ public class ModifyProductoController {
         this.onSuccess = onSuccess;
     }
 
-    public void show(Stage owner, int productoId) {
+    /**
+     * Muestra el diálogo de modificación para un producto específico.
+     *
+     * @param owner Stage padre.
+     * @param productId ID del producto a modificar.
+     */
+    public void show(Stage owner, int productId) {
+        this.currentProductId = productId;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/modify_producto_dialog.fxml"));
             loader.setController(this);
-            VBox root = loader.load();
+            VBox rootNode = loader.load();
 
             dialogStage = new Stage();
-            dialogStage.setTitle("Modificar Producto");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(owner);
-            dialogStage.setScene(new Scene(root));
+            dialogStage.initStyle(StageStyle.DECORATED);
+            dialogStage.setTitle("Modificar Producto");
 
-            loadProducto(productoId);
-            initialize();
+            Scene scene = new Scene(rootNode);
+            scene.setFill(Color.web(ThemeConfig.Colors.BG_PRIMARY));
+            dialogStage.setScene(scene);
+
+            setupStyles();
+            loadProductData();
+            
             dialogStage.showAndWait();
         } catch (IOException e) {
             System.err.println("Error al cargar diálogo: " + e.getMessage());
         }
     }
 
-    private void loadProducto(int productoId) {
-        var productoOpt = findByIdProductoUseCase.execute(productoId);
-        if (productoOpt.isEmpty()) {
-            System.err.println("Producto no encontrado");
-            return;
-        }
-
-        this.producto = productoOpt.get();
-        idField.setText(String.valueOf(producto.getId()));
-        nombreField.setText(producto.getNombre());
-        descripcionField.setText(producto.getDescripcion());
-        precioField.setText(String.valueOf(producto.getPrecio()));
-        cantidadField.setText(String.valueOf(producto.getCantidad()));
-    }
-
+    /**
+     * Inicialización de JavaFX.
+     */
     @FXML
     private void initialize() {
         loadAlmacenes();
-        cancelButton.setOnAction(e -> handleCancel());
-        saveButton.setOnAction(e -> handleSave());
     }
 
+    /**
+     * Carga los almacenes en el ComboBox.
+     */
     private void loadAlmacenes() {
-        try {
-            List<Almacen> almacenes = getAllAlmacenesUseCase.execute();
-            ObservableList<Almacen> observableAlmacenes = FXCollections.observableArrayList(almacenes);
-            almacenCombo.setItems(observableAlmacenes);
+        var almacenes = getAllAlmacenesUseCase.execute();
+        almacenCombo.setItems(FXCollections.observableArrayList(almacenes));
+        almacenCombo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Almacen a) {
+                return (a == null) ? "" : a.getNombre();
+            }
 
-            // Mostrar nombre en el ComboBox
-            almacenCombo.setCellFactory(param -> new ListCell<Almacen>() {
-                @Override
-                protected void updateItem(Almacen item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item.getNombre());
-                }
-            });
-            almacenCombo.setButtonCell(new ListCell<Almacen>() {
-                @Override
-                protected void updateItem(Almacen item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item.getNombre());
-                }
-            });
+            @Override
+            public Almacen fromString(String string) {
+                return null;
+            }
+        });
+    }
 
-            // Seleccionar el almacén actual
-            if (producto != null && producto.getAlmacen() != null) {
-                for (Almacen a : almacenes) {
-                    if (a.getId() == producto.getAlmacen().getId()) {
+    /**
+     * Carga la información actual del producto y la asigna a los campos.
+     */
+    private void loadProductData() {
+        var op = findByIdProductoUseCase.execute(currentProductId);
+        if (op.isPresent()) {
+            var p = op.get();
+            nombreField.setText(p.getNombre());
+            descripcionField.setText(p.getDescripcion());
+            precioField.setText(String.valueOf(p.getPrecio()));
+            cantidadField.setText(String.valueOf(p.getCantidad()));
+            
+            // Seleccionar almacén actual
+            if (p.getAlmacen() != null) {
+                for (Almacen a : almacenCombo.getItems()) {
+                    if (a.getId() == p.getAlmacen().getId()) {
                         almacenCombo.setValue(a);
                         break;
                     }
                 }
             }
-        } catch (Exception e) {
-            System.err.println("Error al cargar almacenes: " + e.getMessage());
         }
     }
 
+    /**
+     * Aplica los estilos del tema.
+     */
+    private void setupStyles() {
+        root.setStyle(ThemeConfig.getContainerStyle());
+
+        // Header
+        Label titleLabel = ComponentFactory.createTitleLabel("Modificar Producto");
+        titleLabel.setFont(FontLoader.getFont(ThemeConfig.Typography.SIZE_2XL));
+        Label subtitleLabel = ComponentFactory.createSubtitleLabel("Actualiza los detalles del artículo");
+        headerContainer.getChildren().addAll(titleLabel, subtitleLabel);
+
+        // Labels
+        Label[] labels = {nombreLabel, descripcionLabel, precioLabel, cantidadLabel, almacenLabel};
+        for (Label l : labels) l.setStyle(ThemeConfig.getLabelStyle());
+
+        // Fields
+        nombreField.setStyle(ThemeConfig.getTextFieldStyle());
+        descripcionField.setStyle(ThemeConfig.getTextFieldStyle());
+        precioField.setStyle(ThemeConfig.getTextFieldStyle());
+        cantidadField.setStyle(ThemeConfig.getTextFieldStyle());
+        almacenCombo.setStyle(ThemeConfig.getTextFieldStyle());
+
+        // Error Label
+        errorLabel.setStyle(ThemeConfig.getErrorTextStyle());
+
+        // Buttons
+        Button styledCancel = ComponentFactory.createSecondaryButton("Cancelar");
+        Button styledSave = ComponentFactory.createPrimaryButton("Guardar Cambios");
+        
+        buttonContainer.getChildren().clear();
+        buttonContainer.getChildren().addAll(styledCancel, styledSave);
+        
+        styledCancel.setOnAction(e -> dialogStage.close());
+        styledSave.setOnAction(e -> handleSave());
+    }
+
+    /**
+     * Maneja el proceso de guardado de los cambios.
+     */
     private void handleSave() {
         String nombre = nombreField.getText().trim();
         String descripcion = descripcionField.getText().trim();
         String precioStr = precioField.getText().trim();
         String cantidadStr = cantidadField.getText().trim();
-        Almacen almacenSeleccionado = almacenCombo.getValue();
+        Almacen almacen = almacenCombo.getValue();
 
-        // Validaciones
-        if (nombre.isEmpty()) {
-            showError("Nombre vacío", "Por favor ingrese el nombre del producto");
-            return;
-        }
-
-        if (nombre.length() < 10) {
-            showError("Nombre muy corto", "El nombre debe tener al menos 10 caracteres");
-            return;
-        }
-
-        if (nombre.length() > 64) {
-            showError("Nombre muy largo", "El nombre no puede exceder 64 caracteres");
-            return;
-        }
-
-        if (!nombre.matches("^[a-zA-Z0-9 ]+$")) {
-            showError("Nombre inválido", "El nombre solo puede contener letras y números");
-            return;
-        }
-
-        if (descripcion.length() > 255) {
-            showError("Descripción muy larga", "La descripción no puede exceder 255 caracteres");
-            return;
-        }
-
-        if (precioStr.isEmpty()) {
-            showError("Precio vacío", "Por favor ingrese el precio");
-            return;
-        }
-
-        if (cantidadStr.isEmpty()) {
-            showError("Cantidad vacía", "Por favor ingrese la cantidad");
-            return;
-        }
-
-        if (almacenSeleccionado == null) {
-            showError("Almacén no seleccionado", "Por favor seleccione un almacén");
-            return;
-        }
-
-        double precio;
-        int cantidad;
-
-        try {
-            precio = Double.parseDouble(precioStr);
-            if (precio <= 0) {
-                showError("Precio inválido", "El precio debe ser mayor a 0");
-                return;
-            }
-        } catch (NumberFormatException ex) {
-            showError("Precio inválido", "Por favor ingrese un precio válido");
+        if (nombre.isEmpty() || precioStr.isEmpty() || cantidadStr.isEmpty() || almacen == null) {
+            showError("Por favor completa los campos obligatorios");
             return;
         }
 
         try {
-            cantidad = Integer.parseInt(cantidadStr);
-            if (cantidad < 0) {
-                showError("Cantidad inválida", "La cantidad no puede ser negativa");
-                return;
+            double precio = Double.parseDouble(precioStr);
+            int cantidad = Integer.parseInt(cantidadStr);
+
+            boolean success = modifyProductoUseCase.execute(
+                    currentProductId, nombre, precio, cantidad, descripcion , almacen.getId()
+            );
+
+            if (success) {
+                if (onSuccess != null) onSuccess.run();
+                dialogStage.close();
+            } else {
+                showError("No se pudo modificar el producto");
             }
-        } catch (NumberFormatException ex) {
-            showError("Cantidad inválida", "Por favor ingrese una cantidad válida");
-            return;
+        } catch (NumberFormatException e) {
+            showError("Precio o cantidad inválidos");
         }
-
-        // Modificar producto
-        boolean success = modifyProductoUseCase.execute(
-                producto.getId(),
-                nombre,
-                precio,
-                cantidad,
-                descripcion,
-                almacenSeleccionado.getId()
-        );
-
-        if (!success) {
-            showError("Error", "No se pudo modificar el producto");
-            return;
-        }
-
-        System.out.println("✓ Producto modificado: " + nombre);
-        if (onSuccess != null) {
-            onSuccess.run();
-        }
-        dialogStage.close();
     }
 
-    private void handleCancel() {
-        dialogStage.close();
-    }
-
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private void showError(String message) {
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+        errorLabel.setManaged(true);
     }
 }

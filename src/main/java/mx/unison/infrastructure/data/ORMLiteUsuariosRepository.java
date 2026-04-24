@@ -8,13 +8,23 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación de UsersRepository utilizando ORMLite para la persistencia.
+ */
 public class ORMLiteUsuariosRepository implements UsersRepository {
     private final UsuarioDAO usuarioDAO;
 
+    /**
+     * Crea una instancia de ORMLiteUsuariosRepository.
+     * @param usuarioDAO El DAO para la entidad Usuario.
+     */
     public ORMLiteUsuariosRepository(UsuarioDAO usuarioDAO) {
         this.usuarioDAO = usuarioDAO;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Usuario> findAll() {
         try {
@@ -25,6 +35,9 @@ public class ORMLiteUsuariosRepository implements UsersRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Usuario> findByName(String name) {
         try {
@@ -35,6 +48,9 @@ public class ORMLiteUsuariosRepository implements UsersRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void create(Usuario usuario) {
         try {
@@ -44,6 +60,9 @@ public class ORMLiteUsuariosRepository implements UsersRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void update(Usuario usuario) {
         try {
@@ -53,6 +72,9 @@ public class ORMLiteUsuariosRepository implements UsersRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void delete(Usuario usuario) {
         try {

@@ -1,20 +1,35 @@
 package mx.unison.presentation.usuarios.dialogs;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.collections.FXCollections;
-import mx.unison.core.domain.models.Usuario;
-import mx.unison.core.domain.repository.UsersRepository;
+import javafx.stage.StageStyle;
+import mx.unison.presentation.components.ComponentFactory;
+import mx.unison.presentation.theme.FontLoader;
+import mx.unison.presentation.theme.ThemeConfig;
 import mx.unison.usecases.usuarios.ModifyUsuarioUseCase;
 
 import java.io.IOException;
 
+/**
+ * Controlador para el diálogo de modificación de un usuario existente.
+ * Permite actualizar la contraseña y el rol de un usuario.
+ * Por seguridad, el nombre de usuario no es editable.
+ */
 public class ModifyUsuarioController {
+    @FXML
+    private VBox root;
+    @FXML
+    private VBox headerContainer;
+    @FXML
+    private VBox formFields;
     @FXML
     private TextField nombreField;
     @FXML
@@ -24,58 +39,75 @@ public class ModifyUsuarioController {
     @FXML
     private ComboBox<String> rolCombo;
     @FXML
+    private Label nombreLabel;
+    @FXML
+    private Label passwordLabel;
+    @FXML
+    private Label confirmPasswordLabel;
+    @FXML
+    private Label rolLabel;
+    @FXML
+    private Label errorLabel;
+    @FXML
     private Button cancelButton;
     @FXML
     private Button saveButton;
     @FXML
-    private VBox root;
+    private HBox buttonContainer;
 
     private ModifyUsuarioUseCase modifyUsuarioUseCase;
-    private UsersRepository usuariosRepository;
     private Runnable onSuccess;
     private Stage dialogStage;
-    private Usuario usuario;
+    private String currentUsername;
 
-    public ModifyUsuarioController(ModifyUsuarioUseCase modifyUsuarioUseCase,
-                                   UsersRepository usuariosRepository,
-                                   Runnable onSuccess) {
-        this.modifyUsuarioUseCase = modifyUsuarioUseCase;
-        this.usuariosRepository = usuariosRepository;
-        this.onSuccess = onSuccess;
-    }
-
-    // Constructor simplificado
+    /**
+     * Constructor del controlador.
+     *
+     * @param modifyUsuarioUseCase Caso de uso para aplicar las modificaciones.
+     * @param onSuccess Callback de éxito.
+     */
     public ModifyUsuarioController(ModifyUsuarioUseCase modifyUsuarioUseCase, Runnable onSuccess) {
         this.modifyUsuarioUseCase = modifyUsuarioUseCase;
         this.onSuccess = onSuccess;
     }
 
-    public void show(Stage owner, String usuarioNombre) {
+    /**
+     * Muestra el diálogo modal para modificar un usuario.
+     *
+     * @param owner Stage padre.
+     * @param username Nombre del usuario a modificar.
+     */
+    public void show(Stage owner, String username) {
+        this.currentUsername = username;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/modify_usuario_dialog.fxml"));
             loader.setController(this);
-            VBox root = loader.load();
+            VBox rootNode = loader.load();
 
             dialogStage = new Stage();
-            dialogStage.setTitle("Modificar Usuario");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(owner);
-            dialogStage.setScene(new Scene(root));
+            dialogStage.initStyle(StageStyle.DECORATED);
+            dialogStage.setTitle("Modificar Usuario");
 
-            loadUsuario(usuarioNombre);
-            initialize();
+            Scene scene = new Scene(rootNode);
+            scene.setFill(Color.web(ThemeConfig.Colors.BG_PRIMARY));
+            dialogStage.setScene(scene);
+
+            setupStyles();
+            
+            // Cargar datos actuales
+            nombreField.setText(username);
+            
             dialogStage.showAndWait();
         } catch (IOException e) {
             System.err.println("Error al cargar diálogo: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
-    private void loadUsuario(String usuarioNombre) {
-        // Para cargar usuario, se pasa mediante el constructor
-        nombreField.setText(usuarioNombre);
-    }
-
+    /**
+     * Inicialización de JavaFX.
+     */
     @FXML
     private void initialize() {
         rolCombo.setItems(FXCollections.observableArrayList(
@@ -84,64 +116,85 @@ public class ModifyUsuarioController {
                 "ALMACEN"
         ));
 
-        if (usuario != null) {
-            nombreField.setText(usuario.getNombre());
-            rolCombo.setValue(usuario.getRol());
-        }
-
         cancelButton.setOnAction(e -> handleCancel());
         saveButton.setOnAction(e -> handleSave());
     }
 
+    /**
+     * Aplica los estilos del tema global.
+     */
+    private void setupStyles() {
+        root.setStyle(ThemeConfig.getContainerStyle());
+
+        // Header
+        Label titleLabel = ComponentFactory.createTitleLabel("Modificar Usuario");
+        titleLabel.setFont(FontLoader.getFont(ThemeConfig.Typography.SIZE_2XL));
+        Label subtitleLabel = ComponentFactory.createSubtitleLabel("Actualiza los permisos del usuario");
+        headerContainer.getChildren().addAll(titleLabel, subtitleLabel);
+
+        // Labels
+        nombreLabel.setStyle(ThemeConfig.getLabelStyle());
+        passwordLabel.setStyle(ThemeConfig.getLabelStyle());
+        confirmPasswordLabel.setStyle(ThemeConfig.getLabelStyle());
+        rolLabel.setStyle(ThemeConfig.getLabelStyle());
+
+        // Fields
+        nombreField.setStyle(ThemeConfig.getTextFieldStyle() + "-fx-opacity: 0.7;");
+        passwordField.setStyle(ThemeConfig.getTextFieldStyle());
+        confirmPasswordField.setStyle(ThemeConfig.getTextFieldStyle());
+        rolCombo.setStyle(ThemeConfig.getTextFieldStyle());
+
+        // Error Label
+        errorLabel.setStyle(ThemeConfig.getErrorTextStyle());
+
+        // Buttons
+        Button styledCancel = ComponentFactory.createSecondaryButton("Cancelar");
+        Button styledSave = ComponentFactory.createPrimaryButton("Guardar Cambios");
+        
+        buttonContainer.getChildren().clear();
+        buttonContainer.getChildren().addAll(styledCancel, styledSave);
+        
+        styledCancel.setOnAction(e -> handleCancel());
+        styledSave.setOnAction(e -> handleSave());
+    }
+
+    /**
+     * Maneja el guardado de cambios. Si la contraseña se deja vacía, no se actualiza.
+     */
     private void handleSave() {
-        String nombre = nombreField.getText().trim();
         String password = passwordField.getText().trim();
         String confirmPassword = confirmPasswordField.getText().trim();
         String rol = rolCombo.getValue();
 
-        if (rol == null) {
-            showError("Rol no seleccionado", "Por favor seleccione un rol");
-            return;
-        }
-
-        // Si se ingresó contraseña, validar
         if (!password.isEmpty()) {
-            if (password.length() < 6) {
-                showError("Contraseña muy corta", "La contraseña debe tener al menos 6 caracteres");
-                return;
-            }
-
             if (!password.equals(confirmPassword)) {
-                showError("Contraseñas no coinciden", "Las contraseñas no son iguales");
+                showError("Las contraseñas no coinciden");
                 return;
             }
-        } else {
-            password = null;  // No cambiar contraseña
         }
 
-        boolean success = modifyUsuarioUseCase.execute(nombre, password, rol);
-
-        if (!success) {
-            showError("Error", "No se pudo modificar el usuario");
+        if (rol == null) {
+            showError("Selecciona un rol");
             return;
         }
 
-        System.out.println("✓ Usuario modificado: " + nombre);
-        if (onSuccess != null) {
-            onSuccess.run();
+        boolean success = modifyUsuarioUseCase.execute(currentUsername, password, rol);
+
+        if (success) {
+            if (onSuccess != null) onSuccess.run();
+            dialogStage.close();
+        } else {
+            showError("No se pudo modificar el usuario");
         }
-        dialogStage.close();
     }
 
     private void handleCancel() {
         dialogStage.close();
     }
 
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private void showError(String message) {
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+        errorLabel.setManaged(true);
     }
 }

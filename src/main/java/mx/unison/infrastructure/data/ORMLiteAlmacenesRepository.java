@@ -8,13 +8,23 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación de AlmacenesRepository utilizando ORMLite para la persistencia.
+ */
 public class ORMLiteAlmacenesRepository implements AlmacenesRepository {
     private final AlmacenDAO almacenDAO;
 
+    /**
+     * Crea una instancia de ORMLiteAlmacenesRepository.
+     * @param almacenDAO El DAO para la entidad Almacen.
+     */
     public ORMLiteAlmacenesRepository(AlmacenDAO almacenDAO) {
         this.almacenDAO = almacenDAO;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Almacen> findAll() {
         try {
@@ -26,6 +36,9 @@ public class ORMLiteAlmacenesRepository implements AlmacenesRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean createAlmacen(Almacen almacen) {
         try {
@@ -38,6 +51,9 @@ public class ORMLiteAlmacenesRepository implements AlmacenesRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Almacen> findById(int id) {
         try {
@@ -49,6 +65,9 @@ public class ORMLiteAlmacenesRepository implements AlmacenesRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean updateAlmacen(Almacen almacen) {
         try {
@@ -61,6 +80,9 @@ public class ORMLiteAlmacenesRepository implements AlmacenesRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteAlmacen(Almacen almacen) {
         try {

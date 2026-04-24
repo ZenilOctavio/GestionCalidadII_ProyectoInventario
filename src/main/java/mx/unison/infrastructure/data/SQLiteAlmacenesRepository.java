@@ -10,13 +10,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación de AlmacenesRepository utilizando JDBC directo para SQLite.
+ */
 public class SQLiteAlmacenesRepository implements AlmacenesRepository {
     private final Database db;
 
+    /**
+     * Crea una instancia de SQLiteAlmacenesRepository.
+     * @param db La conexión a la base de datos.
+     */
     public SQLiteAlmacenesRepository(Database db) {
         this.db = db;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Almacen> findAll() {
         String sql = "SELECT id, nombre, fecha_hora_creacion, fecha_hora_ultima_modificacion, ultimo_usuario_en_modificar FROM almacenes";
@@ -40,6 +50,9 @@ public class SQLiteAlmacenesRepository implements AlmacenesRepository {
 
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean createAlmacen(Almacen almacen) {
         String sql = "INSERT INTO almacenes (nombre, fecha_hora_creacion, fecha_hora_ultima_modificacion, ultimo_usuario_en_modificar) VALUES (?,?,?,?)";
@@ -61,6 +74,9 @@ public class SQLiteAlmacenesRepository implements AlmacenesRepository {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Almacen> findById(int id) {
         String sql = "SELECT * FROM almacenes WHERE id = ?";
@@ -85,6 +101,9 @@ public class SQLiteAlmacenesRepository implements AlmacenesRepository {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean updateAlmacen(Almacen almacen) {
         String sql = "UPDATE almacenes SET nombre=?, fecha_hora_ultima_modificacion=?, ultimo_usuario_en_modificar=? WHERE id = ?";
@@ -107,6 +126,9 @@ public class SQLiteAlmacenesRepository implements AlmacenesRepository {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteAlmacen(Almacen almacen) {
         String sql = "DELETE FROM almacenes WHERE id = ?";
@@ -123,6 +145,13 @@ public class SQLiteAlmacenesRepository implements AlmacenesRepository {
         }
     }
 
+    /**
+     * Mapea un ResultSet a un objeto Almacen.
+     *
+     * @param res El ResultSet de la consulta.
+     * @return Un objeto Almacen poblado.
+     * @throws SQLException Si ocurre un error al acceder a los datos.
+     */
     private Almacen mapResultSetToAlmacen(ResultSet res) throws SQLException {
         var almacen = new Almacen();
         almacen.setId(res.getInt("id"));

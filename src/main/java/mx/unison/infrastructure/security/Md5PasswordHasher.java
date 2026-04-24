@@ -4,8 +4,19 @@ import mx.unison.core.domain.services.PasswordHasher;
 
 import java.security.MessageDigest;
 
+/**
+ * Implementación de PasswordHasher que utiliza el algoritmo MD5.
+ * Nota: MD5 no es seguro para producción, pero se usa aquí según los requerimientos legacy.
+ */
 public class Md5PasswordHasher implements PasswordHasher {
 
+    /**
+     * Genera un hash MD5 de la contraseña proporcionada.
+     *
+     * @param password La contraseña en texto plano.
+     * @return El hash MD5 como una cadena hexadecimal.
+     * @throws RuntimeException Si el algoritmo MD5 no está disponible o hay error de codificación.
+     */
     @Override
     public String hash(String password) {
         try {
@@ -19,6 +30,13 @@ public class Md5PasswordHasher implements PasswordHasher {
         }
     }
 
+    /**
+     * Verifica si la contraseña coincide con el hash MD5.
+     *
+     * @param password La contraseña en texto plano.
+     * @param hashed El hash contra el cual comparar.
+     * @return true si coinciden, false en caso contrario.
+     */
     @Override
     public boolean verify(String password, String hashed) {
         String hashed2 = hash(password);

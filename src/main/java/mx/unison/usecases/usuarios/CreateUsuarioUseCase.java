@@ -4,15 +4,32 @@ import mx.unison.core.domain.models.Usuario;
 import mx.unison.core.domain.repository.UsersRepository;
 import mx.unison.core.domain.services.PasswordHasher;
 
+/**
+ * Caso de uso para la creación de nuevos usuarios en el sistema.
+ */
 public class CreateUsuarioUseCase {
     private final UsersRepository repository;
     private final PasswordHasher passwordHasher;
 
+    /**
+     * Crea una instancia de CreateUsuarioUseCase.
+     *
+     * @param repository El repositorio de usuarios.
+     * @param passwordHasher El servicio de hashing de contraseñas.
+     */
     public CreateUsuarioUseCase(UsersRepository repository, PasswordHasher passwordHasher) {
         this.repository = repository;
         this.passwordHasher = passwordHasher;
     }
 
+    /**
+     * Ejecuta la lógica para crear un nuevo usuario.
+     *
+     * @param nombre El nombre del nuevo usuario.
+     * @param contrasena La contraseña en texto plano.
+     * @param rol El rol asignado al usuario.
+     * @return true si el usuario se creó correctamente, false si ya existe o hubo un error.
+     */
     public boolean execute(String nombre, String contrasena, String rol) {
         // Validar que el usuario no exista
         if (repository.findByName(nombre).isPresent()) {

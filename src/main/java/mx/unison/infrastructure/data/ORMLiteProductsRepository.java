@@ -8,13 +8,23 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación de ProductsRepository utilizando ORMLite para la persistencia.
+ */
 public class ORMLiteProductsRepository implements ProductsRepository {
     private final ProductoDAO productoDAO;
 
+    /**
+     * Crea una instancia de ORMLiteProductsRepository.
+     * @param productoDAO El DAO para la entidad Producto.
+     */
     public ORMLiteProductsRepository(ProductoDAO productoDAO) {
         this.productoDAO = productoDAO;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Producto> findAll() {
         try {
@@ -26,6 +36,9 @@ public class ORMLiteProductsRepository implements ProductsRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean createProduct(Producto producto) {
         try {
@@ -38,6 +51,9 @@ public class ORMLiteProductsRepository implements ProductsRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Producto> findById(int id) {
         try {
@@ -49,6 +65,9 @@ public class ORMLiteProductsRepository implements ProductsRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean updateProduct(Producto producto) {
         try {
@@ -61,6 +80,9 @@ public class ORMLiteProductsRepository implements ProductsRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteProduct(Producto producto) {
         try {
