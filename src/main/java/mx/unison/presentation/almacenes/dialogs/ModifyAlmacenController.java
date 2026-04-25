@@ -142,13 +142,18 @@ public class ModifyAlmacenController {
             return;
         }
 
-        boolean success = modifyAlmacenUseCase.execute(currentAlmacenId, nombre);
+        try {
+            boolean success = modifyAlmacenUseCase.execute(currentAlmacenId, nombre);
 
-        if (success) {
-            if (onSuccess != null) onSuccess.run();
-            dialogStage.close();
-        } else {
-            showError("No se pudo modificar el almacén");
+            if (success) {
+                if (onSuccess != null) onSuccess.run();
+                dialogStage.close();
+            } else {
+                showError("No se pudo modificar el almacén");
+            }
+        }
+        catch(IllegalArgumentException e){
+            showError(e.getMessage());
         }
     }
 

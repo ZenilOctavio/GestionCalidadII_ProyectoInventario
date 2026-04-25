@@ -25,7 +25,9 @@ public class DeleteProductUseCase {
     public boolean execute(int id){
         var prodOpt = repository.findById(id);
 
-        if (prodOpt.isEmpty()) return false;
+        if (prodOpt.isEmpty()) {
+            throw new RuntimeException("Producto con ID " + id + " no encontrado");
+        }
 
         var producto = prodOpt.get();
 

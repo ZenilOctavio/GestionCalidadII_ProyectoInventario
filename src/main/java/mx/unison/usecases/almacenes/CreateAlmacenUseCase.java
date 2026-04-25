@@ -26,6 +26,10 @@ public class CreateAlmacenUseCase {
      * @return true si la creación fue exitosa, false en caso contrario.
      */
     public boolean execute (String nombre) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del almacén es obligatorio");
+        }
+
         long timeStamp = System.currentTimeMillis();
         var nuevoAlmacen = new Almacen();
         nuevoAlmacen.setNombre(nombre);
@@ -33,8 +37,6 @@ public class CreateAlmacenUseCase {
         nuevoAlmacen.setFechaHoraUltimaMod(String.valueOf(timeStamp));
         nuevoAlmacen.setUltimoUsuario("ADMIN");
 
-
         return repository.createAlmacen(nuevoAlmacen);
-
     }
 }

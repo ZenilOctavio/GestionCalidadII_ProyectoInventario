@@ -178,13 +178,17 @@ public class ModifyUsuarioController {
             return;
         }
 
-        boolean success = modifyUsuarioUseCase.execute(currentUsername, password, rol);
+        try {
+            boolean success = modifyUsuarioUseCase.execute(currentUsername, password, rol);
 
-        if (success) {
-            if (onSuccess != null) onSuccess.run();
-            dialogStage.close();
-        } else {
-            showError("No se pudo modificar el usuario");
+            if (success) {
+                if (onSuccess != null) onSuccess.run();
+                dialogStage.close();
+            } else {
+                showError("No se pudo modificar el usuario");
+            }
+        } catch (IllegalArgumentException e ){
+            showError(e.getMessage());
         }
     }
 

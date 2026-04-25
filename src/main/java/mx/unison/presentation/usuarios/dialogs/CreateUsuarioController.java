@@ -183,13 +183,17 @@ public class CreateUsuarioController {
             return;
         }
 
-        boolean success = createUsuarioUseCase.execute(nombre, password, rol);
+        try {
+            boolean success = createUsuarioUseCase.execute(nombre, password, rol);
 
-        if (success) {
-            if (onSuccess != null) onSuccess.run();
-            dialogStage.close();
-        } else {
-            showError("No se pudo crear el usuario");
+            if (success) {
+                if (onSuccess != null) onSuccess.run();
+                dialogStage.close();
+            } else {
+                showError("No se pudo crear el usuario");
+            }
+        } catch (IllegalArgumentException e) {
+            showError(e.getMessage());
         }
     }
 

@@ -24,6 +24,9 @@ public class Almacen {
     @DatabaseField(columnName = "ultimo_usuario_en_modificar")
     private String ultimoUsuario;
 
+    @DatabaseField(columnName = "ubicacion", throwIfNull = false, canBeNull = true)
+    private String ubicacion;
+
     /**
      * Constructor por defecto requerido por ORMLite.
      */
@@ -90,6 +93,14 @@ public class Almacen {
         return ultimoUsuario;
     }
 
+    /**
+     * Obtiene la ubicacion del almacen.
+     * @return La ubicacion.
+     */
+    public String getUbicacion() {
+        return ubicacion;
+    }
+
     // Setters
     /**
      * Establece el identificador del almacén.
@@ -129,6 +140,14 @@ public class Almacen {
      */
     public void setUltimoUsuario(String ultimoUsuario) {
         this.ultimoUsuario = ultimoUsuario;
+    }
+
+    /**
+     * Establece la ubicacion.
+     * @param ubicacion La ubicacion del almacen.
+     */
+    public void setUbicacion(String ubicacion) {
+        this.ubicacion = ubicacion;
     }
 
     // Métodos de compatibilidad con el record anterior

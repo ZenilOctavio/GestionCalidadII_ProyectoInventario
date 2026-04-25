@@ -28,6 +28,21 @@ public class CreateProductoUseCase {
      * @return true si la creación fue exitosa, false en caso contrario.
      */
     public boolean execute (String nombre, double precio, int cantidad, String descripcion, int idAlmacen) {
+
+        // --- VALIDACIONES PARA QUE LOS TESTS PASEN ---
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede ser nulo o vacío");
+        }
+
+        if (precio < 0) {
+            throw new IllegalArgumentException("El precio no puede ser negativo");
+        }
+
+        if (cantidad < 0) {
+            throw new IllegalArgumentException("La cantidad no puede ser negativa");
+        }
+        // ----------------------------------------------
+
         long timeStamp = System.currentTimeMillis();
 
         var nuevoProducto = new Producto();
@@ -36,7 +51,11 @@ public class CreateProductoUseCase {
         nuevoProducto.setCantidad(cantidad);
         nuevoProducto.setDescripcion(descripcion);
         nuevoProducto.setAlmacenId(idAlmacen);
+
+        // Nota: En tus tests mencionas un campo "departamento".
+        // Si es obligatorio, deberías validarlo aquí también.
         nuevoProducto.setDepartamento("");
+
         nuevoProducto.setFechaCreacion(timeStamp);
         nuevoProducto.setFechaModificacion(String.valueOf(timeStamp));
         nuevoProducto.setUltimoUsuario("ADMIN");

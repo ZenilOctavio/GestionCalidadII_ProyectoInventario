@@ -28,7 +28,18 @@ public class ModifyProductoUseCase {
      * @param idAlmacen Nuevo identificador de almacén asociado.
      * @return true si la actualización fue exitosa, false en caso contrario.
      */
-    public boolean execute(int id, String nombre, double precio, int cantidad, String descripcion, int idAlmacen){
+    public boolean execute(int id, String nombre, double precio, int cantidad, String descripcion, int idAlmacen) {
+        // Validaciones de negocio
+        if (precio < 0) {
+            throw new IllegalArgumentException("El precio no puede ser negativo");
+        }
+        if (cantidad < 0) {
+            throw new IllegalArgumentException("La cantidad no puede ser negativa");
+        }
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre es obligatorio");
+        }
+
         long timeStamp = System.currentTimeMillis();
 
         var nuevoProducto = new Producto();

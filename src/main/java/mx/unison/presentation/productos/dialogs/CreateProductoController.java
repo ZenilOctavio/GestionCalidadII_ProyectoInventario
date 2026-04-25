@@ -201,6 +201,8 @@ public class CreateProductoController {
             }
         } catch (NumberFormatException e) {
             showError("Precio o cantidad inválidos");
+        } catch (IllegalArgumentException e) {
+            showError(e.getMessage());
         }
     }
 

@@ -126,14 +126,18 @@ public class CreateAlmacenController {
             return;
         }
 
-        boolean success = createAlmacenUseCase.execute(nombre);
+       try {
+           boolean success = createAlmacenUseCase.execute(nombre);
 
-        if (success) {
-            if (onSuccess != null) onSuccess.run();
-            dialogStage.close();
-        } else {
-            showError("No se pudo crear el almacén");
-        }
+           if (success) {
+               if (onSuccess != null) onSuccess.run();
+               dialogStage.close();
+           } else {
+               showError("No se pudo crear el almacén");
+           }
+       } catch(IllegalArgumentException e) {
+           showError(e.getMessage());
+       }
     }
 
     /**
