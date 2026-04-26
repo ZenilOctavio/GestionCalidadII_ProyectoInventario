@@ -1,7 +1,13 @@
-# Alvazarito - Sistema de Gestión de Inventarios
+# Sistema de Gestión de Inventarios
 
-**Alvazarito** es una aplicación de escritorio robusta diseñada para la gestión eficiente de inventarios, almacenes y usuarios. El proyecto ha sido desarrollado siguiendo los principios de **Clean Architecture**, garantizando un sistema escalable, mantenible y altamente testeable.
+Es una aplicación de escritorio robusta diseñada para la gestión eficiente de inventarios, almacenes y usuarios. El proyecto ha sido desarrollado siguiendo los principios de **Clean Architecture**, garantizando un sistema escalable, mantenible y altamente testeable.
 
+---
+```aiignore
+Para entrar al sistema puedes utilizar las siguientes credenciales:
+Usuario: ADMIN
+contraseña: admin23
+```
 ---
 
 ## ⚙️ Arquitectura del Proyecto
